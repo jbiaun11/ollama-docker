@@ -3,16 +3,11 @@ services:
     image: ghcr.io/open-webui/open-webui:main
     container_name: openwebui
     hostname: openwebui
-    networks:
-      - traefik-net
-    restart: unless-stopped
+    restart: always
+    ports:
+      - "3000:8080"
     volumes:
-      - ./open-webui-local:/app/backend/data
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.openwebui.rule=Host(`openwebui.domain.com`)"
-      - "traefik.http.routers.openwebui.entrypoints=https"
-      - "traefik.http.services.openwebui.loadbalancer.server.port=8080"
+      - /path/to/folder:/app/backend/data
     environment:
       OLLAMA_BASE_URLS: http://ollama:11434
 
@@ -20,10 +15,13 @@ services:
     image: ollama/ollama:latest
     container_name: ollama
     hostname: ollama
-    networks:
-      - traefik-net
+    ports:
+      - "11434:11434"
     volumes:
-      - ./ollama-local:/root/.ollama
-networks:
-  traefik-net:
+      - ollama-local:/root/.ollama
+
+volumes:
+  ollama-local:
+    external: true
+  open-webui-local:
     external: true
